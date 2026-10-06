@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}FitBuddy — History{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <span class="eyebrow">SAVED PLANS</span>
+    <h1>Workout History</h1>
+    <p>Plans generated on this computer are stored locally in SQLite.</p>
+</section>
+
+<section class="panel">
+    <form class="history-search" method="get">
+        <input name="user_id" value="{{ user_id }}" placeholder="Filter by User ID">
+        <button class="secondary" type="submit">Search</button>
+        {% if user_id %}
+        <a class="text-link" href="{{ url_for('history') }}">Clear</a>
+        {% endif %}
+    </form>
+</section>
+
+<section class="history-list">
+    {% if rows %}
+        {% for row in rows %}
+        <a class="history-card" href="{{ url_for('history_detail', record_id=row.id) }}">
+            <div>
+                <strong>{{ row.name }}</strong>
+                <span>{{ row.user_id }} · {{ row.goal }} · {{ row.intensity }}</span>
+            </div>
+            <div class="history-meta">
+                <span>{{ row.source }}</span>
+                <small>{{ row.created_at.replace('T', ' ') }}</small>
+            </div>
+        </a>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            No workout plans found yet.
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

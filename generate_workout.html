@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}FitBuddy — AI Fitness Planner{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <span class="eyebrow">AI FITNESS PLANNER</span>
+    <h1>FitBuddy</h1>
+    <p>Build a practical 7-day activity and recovery plan with Gemini.</p>
+</section>
+
+<section class="panel form-panel">
+    <form method="post" action="{{ url_for('generate_workout') }}" id="workoutForm">
+        <div class="grid two">
+            <label>
+                <span>User ID</span>
+                <input name="user_id" required maxlength="30"
+                       value="{{ form.get('user_id', '') }}" placeholder="TA123">
+            </label>
+
+            <label>
+                <span>Name</span>
+                <input name="name" required maxlength="60"
+                       value="{{ form.get('name', '') }}" placeholder="TAMIL">
+            </label>
+
+            <label>
+                <span>Age</span>
+                <input name="age" type="number" min="13" max="100" required
+                       value="{{ form.get('age', '') }}" placeholder="25">
+            </label>
+
+            <label>
+                <span>Weight (kg)</span>
+                <input name="weight" type="number" min="25" max="300" step="0.1" required
+                       value="{{ form.get('weight', '') }}" placeholder="78.0">
+            </label>
+
+            <label>
+                <span>Fitness goal</span>
+                <select name="goal" required>
+                    {% for goal in goals %}
+                        <option value="{{ goal }}"
+                            {% if form.get('goal', 'General wellness') == goal %}selected{% endif %}>
+                            {{ goal }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </label>
+
+            <label>
+                <span>Intensity</span>
+                <select name="intensity" required>
+                    {% for intensity in intensities %}
+                        <option value="{{ intensity }}"
+                            {% if form.get('intensity', 'Medium') == intensity %}selected{% endif %}>
+                            {{ intensity }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </label>
+        </div>
+
+        <button type="submit" class="primary" id="generateBtn">
+            Generate My 7-Day Plan
+        </button>
+
+        <p class="form-help">
+            If Gemini returns a temporary 503/high-demand error, FitBuddy retries automatically
+            and can switch to a backup model.
+        </p>
+    </form>
+</section>
+
+{% if plan %}
+<section class="results">
+    <div class="result-heading">
+        <div>
+            <span class="eyebrow">YOUR PLAN</span>
+            <h2>{{ user.name }}'s 7-Day Fitness Plan</h2>
+            <p>{{ plan.summary }}</p>
+        </div>
+        <div class="source-chip">
+            {{ source }}
+            {% if model_used %}<small>{{ model_used }}</small>{% endif %}
+        </div>
+    </div>
+
+    <div class="days">
+        {% for day in plan.days %}
+        <article class="day-card">
+            <div class="day-top">
+                <span>{{ day.day }}</span>
+                <strong>{{ day.duration }}</strong>
+            </div>
+            <h3>{{ day.focus }}</h3>
+
+            <div class="section-block">
+                <h4>Warm-up</h4>
+                <ul>
+                    {% for item in day.warmup %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="section-block">
+                <h4>Main workout</h4>
+                <div class="exercise-list">
+                    {% for item in day.workout %}
+                    <div class="exercise">
+                        <strong>{{ item.exercise }}</strong>
+                        <span>{{ item.sets }} set(s) · {{ item.reps }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="section-block">
+                <h4>Cool-down</h4>
+                <ul>
+                    {% for item in day.cooldown %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="recovery-note">
+                <strong>Recovery:</strong> {{ day.recovery }}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+
+    <div class="safety-note">
+        <strong>Safety note:</strong> {{ plan.safety_note }}
+    </div>
+</section>
+{% endif %}
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}

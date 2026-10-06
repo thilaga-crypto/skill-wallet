@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}FitBuddy — Saved Plan{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <span class="eyebrow">SAVED PLAN</span>
+    <h1>{{ user.name }}'s Plan</h1>
+    <p>
+        {{ user.user_id }} · {{ user.goal }} · {{ user.intensity }} ·
+        {{ created_at.replace('T', ' ') }}
+    </p>
+</section>
+
+<section class="results">
+    <div class="result-heading">
+        <div>
+            <h2>7-Day Fitness Plan</h2>
+            <p>{{ plan.summary }}</p>
+        </div>
+        <div class="source-chip">
+            {{ source }}
+            {% if model_used %}<small>{{ model_used }}</small>{% endif %}
+        </div>
+    </div>
+
+    <div class="days">
+        {% for day in plan.days %}
+        <article class="day-card">
+            <div class="day-top">
+                <span>{{ day.day }}</span>
+                <strong>{{ day.duration }}</strong>
+            </div>
+            <h3>{{ day.focus }}</h3>
+
+            <div class="section-block">
+                <h4>Warm-up</h4>
+                <ul>
+                    {% for item in day.warmup %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="section-block">
+                <h4>Main workout</h4>
+                <div class="exercise-list">
+                    {% for item in day.workout %}
+                    <div class="exercise">
+                        <strong>{{ item.exercise }}</strong>
+                        <span>{{ item.sets }} set(s) · {{ item.reps }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="section-block">
+                <h4>Cool-down</h4>
+                <ul>
+                    {% for item in day.cooldown %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="recovery-note">
+                <strong>Recovery:</strong> {{ day.recovery }}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+
+    <div class="safety-note">
+        <strong>Safety note:</strong> {{ plan.safety_note }}
+    </div>
+</section>
+{% endblock %}
